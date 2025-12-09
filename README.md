@@ -16,10 +16,10 @@ Third, we determine which stations and rail lines experience the highest frequen
 
 Finally, we identify which offense types occur most frequently within the transit system, and how their frequency changes over time. We believe understanding the relative frequency of different offenses will help to highlight the types of incidents that impose burden on the riders, employees and WMATA system operations.
 
-### Limitations
+### II. Limitations
 One limitation of this analysis is the absence of ridership data for each station. Because we only used raw incident counts, stations with higher passenger volume would naturally appear to have more crime. Having ridership data would have allowed us to normalize crime incident counts and compare stations fairly. 
 
-### References 
+### III. References 
 Open Data DC. (2012, July 13). Metro Stations Regional. Open Data DC. https://opendata.dc.gov/datasets/DCGIS::metro-stations-regional/about
 WMATA. (n.d.). Crime Statistics. WMATA. Retrieved December 6, 2025, from https://www.wmata.com/about/transit-police/crime-stats.cfm
 WMATA. (n.d.). Public Records Performance Records Excel. WMATA. Retrieved December 6, 2025, from https://www.wmata.com/about/records/public-records.cfm
