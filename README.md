@@ -74,7 +74,7 @@ month_pattern = re.compile(
 	re.I
 )
  
-# Extract actual PDF path from javascript-based links
+### Extract actual PDF path from javascript-based links
 pdf_js_pattern = re.compile(r",(/about/transit-police/upload/[^)']+\.pdf)")
  
 ### Fetch main page
