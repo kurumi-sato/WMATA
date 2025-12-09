@@ -1,65 +1,8 @@
+# Database Management Systems
 
-   
-
-
-
+## “WMATA(Washington Metropolitan Area Transit Authority) Crime Analysis” 
 
 
-
-
-
-BUDT703: Database Management Systems
-Professor: Dr. Woei-jyh (Adam) Lee
-Last Updated Date: December 6th, 2025 
-
-“WMATA(Washington Metropolitan Area Transit Authority) Crime Analysis” 
-
-
-Final Project Report
-By
-KARY Metro Guards
-Youngseo Chang 
-Rohith Moravaneni
-Kurumi Sato
-Ajay Vishwanatha
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Table of Contents
- Introduction 
-Mission Statement 
-Mission Objectives
-Data Processing
-Data Extraction 
-Data Consolidation 
-Data Cleaning
-Business Transactions 
-What is the share of total incidents across all station lines?
-What are the top stations by number of incidents and how do they differ during  different time periods?
-Do stations with more lines tend to have more incidents?
-What are the Top 10 most frequently occurring offence categories?
-What is the total number of incidents?
-What is the share of total incidents by time of the day?
-What is the station with the most number of incidents?
-What station line has the most number of incidents?
-What is the total number of crimes over the months?
-How has the customer and employee injury changed over time?
-How have the most frequent types of offenses changed over the months?
-Conclusion
-Insights
-Recommendations
-Limitations
 Ⅰ. Introduction
 Mission Statement 
 The mission of this project is to analyze the Washington Metropolitan Area Transit Authority (WMATA) performance records related to crime incidents, customer and employee injuries, and stations. By organizing these records within a structured database and applying analysis, we seek to derive recurring safety trends and patterns across the WMATA systems. The ultimate goal of this project is to generate clear, data-driven insights that can be utilized to improve overall passenger and employee safety throughout the WMATA transit network.
@@ -85,18 +28,18 @@ import pandas as pd
 from geopy.geocoders import GoogleV3
 import time
  
-# Load data
+### Load data
 stations = pd.read_excel(“…”)
 unique_locations = pd.read_excel(“…”)   # These are the unique locations of the Daily Incident Table
  
-# Initialize geocoder (API KEY)
+### Initialize geocoder (API KEY)
 geolocator = GoogleV3(api_key=”YOUR_API_KEY”)
  
-# Add columns for latitude and longitude
+### Add columns for latitude and longitude
 unique_locations["Latitude"] = None
 unique_locations["Longitude"] = None
  
-# Geocode each unique address
+### Geocode each unique address
 for i, address in enumerate(unique_locations["location"]):
 	try:
     	location = geolocator.geocode(address)
@@ -109,7 +52,7 @@ for i, address in enumerate(unique_locations["location"]):
         print(f"Error for {address}: {e}")
     time.sleep(0.1) 
  
-# Save geocoded addresses
+### Save geocoded addresses
 unique_locations.to_excel("Incident_unique_geocoded.xlsx", index=False)
 The Daily Incident table was created using the monthly blotter sheets from WMATA’s crime statistics (WMATA, n.d.). Python scripts were used to download all available monthly PDFs, convert each PDF into CSV format, and to concatenate the individual CSVs into one combined CSV.
 Python Script to download the monthly blotter sheets:
@@ -124,7 +67,7 @@ URL = "https://www.wmata.com/about/transit-police/crime-stats.cfm"
 BASE_DIR = "pdfs"
 os.makedirs(BASE_DIR, exist_ok=True)
  
-# Match month-day-year ranges like "October 1 - 31, 2020"
+### Match month-day-year ranges like "October 1 - 31, 2020"
 month_pattern = re.compile(
     r"(January|February|March|April|May|June|July|August|September|October|November|December)"
     r"\s+\d+\s*[-–—]\s*\d+,\s*(20\d{2})",
@@ -134,14 +77,14 @@ month_pattern = re.compile(
 # Extract actual PDF path from javascript-based links
 pdf_js_pattern = re.compile(r",(/about/transit-police/upload/[^)']+\.pdf)")
  
-# Fetch main page
+### Fetch main page
 response = requests.get(URL)
 response.raise_for_status()
 soup = BeautifulSoup(response.text, "html.parser")
  
 count = 0
  
-# Loop through all links on the page
+### Loop through all links on the page
 for a in soup.find_all("a", href=True):
 	text = " ".join(a.get_text(strip=True).split())
 	match = month_pattern.search(text)
@@ -193,10 +136,10 @@ Python Script to the PDFs convert to CSVs:
 import os
 import tabula
 
- # folder that contains all year folders
+ ### folder that contains all year folders
  base_folder = "pdfs"
 
- # loop through all year folders
+ ### loop through all year folders
  for year_folder in os.listdir(base_folder):
  	year_path = os.path.join(base_folder, year_folder)
  	if not os.path.isdir(year_path):
@@ -220,7 +163,7 @@ import tabula
 Python Script to concatenate all the CSVs:
 import os
  
-# Base folder containing the year subfolders with PDFs and CSVs
+### Base folder containing the year subfolders with PDFs and CSVs
 base_folder = r"PATH_TO_PDFS_FOLDER"
 output_file = r"PATH_TO_OUTPUT\combined_blotter_main.csv"
  
@@ -251,39 +194,39 @@ Python Script to build a KDTree to match daily incident to its nearest station:
 import pandas as pd
 from scipy.spatial import cKDTree
  
-# Load prepared datasets (
+### Load prepared datasets (
 incident_df = pd.read_excel("Daily_Incident.xlsx")
 station_df  = pd.read_excel("Stations_with_coords.xlsx")
  
-# Ensure latitude/longitude are numeric
+### Ensure latitude/longitude are numeric
 incident_df["Latitude"]  = pd.to_numeric(incident_df["Latitude"], errors="coerce")
 incident_df["Longitude"] = pd.to_numeric(incident_df["Longitude"], errors="coerce")
 station_df["Latitude"]   = pd.to_numeric(station_df["Latitude"], errors="coerce")
 station_df["Longitude"]  = pd.to_numeric(station_df["Longitude"], errors="coerce")
  
-# Remove rows with missing coordinates
+### Remove rows with missing coordinates
 incident_df = incident_df.dropna(subset=["Latitude", "Longitude"]).reset_index(drop=True)
 station_df  = station_df.dropna(subset=["Latitude", "Longitude"]).reset_index(drop=True)
  
 print(f"Incidents with valid coordinates: {len(incident_df)}")
 print(f"Stations with valid coordinates: {len(station_df)}")
  
-# Convert coordinates to arrays
+### Convert coordinates to arrays
 incident_coords = incident_df[["Latitude", "Longitude"]].to_numpy()
 station_coords  = station_df[["Latitude", "Longitude"]].to_numpy()
  
-# Build KDTree using station coordinates
+### Build KDTree using station coordinates
 tree = cKDTree(station_coords)
  
-# Find nearest station for each incident
+### Find nearest station for each incident
 distances, indices = tree.query(incident_coords, k=1)
  
 incident_df["NearestStationID"] = station_df.iloc[indices]["StationID"].values
  
-# Convert degree distance to approximate kilometers
+### Convert degree distance to approximate kilometers
 incident_df["Distance_km"] = distances * 111 
  
-# Save the result
+### Save the result
 incident_df.to_excel("incident_with_station.xlsx", index=False)
 print("Saved nearest-station results to 'incident_with_station.xlsx'")
 This script adds the nearest station ID to each daily incident with distance in kilometers. Incidents with a distance of greater than 0.5 km were later filtered out in a created view ‘DailyIncidentNearStation’ which was used for analysis.
